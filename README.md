@@ -1,4 +1,11 @@
-# ci-restserver
-Check the recent version at https://github.com/chriskacerguis/codeigniter-restserver
+## Backend 
 
-My alternate version https://github.com/ardisaurus/old-rest-ci
+Proyek ini didasarkan pada [codeigniter-restserver](https://github.com/chriskacerguis/codeigniter-restserver) yang sudah diimplementasi khusus yang disesuaikan dengan kebutuhan kami, tetapi tetap mengikuti dasar-dasar dari [codeigniter-restserver](https://github.com/chriskacerguis/codeigniter-restserver). Pastikan untuk memeriksa versi terbaru di [sini](https://github.com/chriskacerguis/codeigniter-restserver) dan versi alternatif di [sini](https://github.com/ardisaurus/old-rest-ci).
+
+## Kontribusi
+
+Jika Anda ingin berkontribusi pada proyek ini, silakan buat *pull request* dan kami akan tinjau.
+
+## Lisensi
+
+Proyek ini dilisensikan di bawah Lisensi MIT - lihat file [LICENSE](LICENSE) untuk detailnya.
