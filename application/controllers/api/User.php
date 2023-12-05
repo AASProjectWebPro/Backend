@@ -31,9 +31,9 @@ class User extends REST_Controller
     {
         $id = $this->get('id');
         if ($id == '') {
-            $data = $this->UserModel->fetchAll();
+            $data = $this->UserModel->read();
         } else {
-            $data = $this->UserModel->fetchSingleData($id);
+            $data = $this->UserModel->read($id);
         }
         $this->response($data, 200);
     }
@@ -63,11 +63,20 @@ class User extends REST_Controller
             return $this->response($response,201);
         }
     }
+    public function ifExist($id)
+    {
+        if ($this->UserModel->ifExist($id)) {
+            return true;
+        } else {
+            $this->form_validation->set_message('ifExist', 'The ID field not found.');
+            return false;
+        }
+    }
     function index_put()
     {
         $this->mengakaliFormValidationYangHanyaMendeteksiPostRequest();
         $this->validate();
-        $this->form_validation->set_rules('id', 'ID', 'required|numeric');
+        $this->form_validation->set_rules('id', 'ID', 'required|callback_ifExist');
         if ($this->form_validation->run() === FALSE) {
             $error_array = $this->form_validation->error_array();
             $response = array(
@@ -83,7 +92,7 @@ class User extends REST_Controller
             'nomor_telepon' => $this->put('nomor_telepon'),
             'alamat' => $this->put('alamat')
         );
-        if($this->UserModel->updateData($this->put('id'),$data)){
+        if($this->UserModel->update($this->put('id'),$data)){
             $response = array(
                 'status' => 201,
                 'message' => 'Success'
@@ -94,7 +103,7 @@ class User extends REST_Controller
     function index_delete()
     {
         $this->mengakaliFormValidationYangHanyaMendeteksiPostRequest();
-        $this->form_validation->set_rules('id', 'ID', 'required|numeric');
+        $this->form_validation->set_rules('id', 'ID', 'required|callback_ifExist');
         if ($this->form_validation->run() === FALSE) {
             $error_array = $this->form_validation->error_array();
             $response = array(
@@ -103,18 +112,12 @@ class User extends REST_Controller
             );
             return $this->response($response,502);
         }
-        if($this->UserModel->deleteData($this->put('id'))){
+        if($this->UserModel->delete($this->put('id'))){
             $response = array(
                 'status' => 201,
                 'message' => 'Success'
             );
             return $this->response($response,201);
-        }else{
-            $response = array(
-                'status' => 502,
-                'message' => 'ID tidak ditemukan'
-            );
-            return $this->response($response,502);
         }
     }
 
