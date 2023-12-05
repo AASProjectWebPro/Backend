@@ -1,11 +1,11 @@
-## Backend 
+## Backend
 
-Proyek ini didasarkan pada [codeigniter-restserver](https://github.com/chriskacerguis/codeigniter-restserver) yang sudah diimplementasi khusus yang disesuaikan dengan kebutuhan kami, tetapi tetap mengikuti dasar-dasar dari [codeigniter-restserver](https://github.com/chriskacerguis/codeigniter-restserver). Pastikan untuk memeriksa versi terbaru di [sini](https://github.com/chriskacerguis/codeigniter-restserver) dan versi alternatif di [sini](https://github.com/ardisaurus/old-rest-ci).
+This project is based on [codeigniter-restserver](https://github.com/chriskacerguis/codeigniter-restserver) which has a custom implementation tailored to our needs, but still follows the basics of [codeigniter-restserver](https:/ /github.com/chriskacerguis/codeigniter-restserver). Be sure to check out the latest version at [here](https://github.com/chriskacerguis/codeigniter-restserver) and the alternative version at [here](https://github.com/ardisaurus/old-rest-ci).
 
-## Kontribusi
+## Contribution
 
-Jika Anda ingin berkontribusi pada proyek ini, silakan buat *pull request* dan kami akan tinjau.
+If you would like to contribute to this project, please create a *pull request* and we will review it.
 
-## Lisensi
+## Licence
 
-Proyek ini dilisensikan di bawah Lisensi MIT - lihat file [LICENSE](LICENSE) untuk detailnya.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
