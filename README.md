@@ -1,6 +1,6 @@
 ## Backend 
 
-Proyek ini didasarkan pada [codeigniter-restserver](https://github.com/chriskacerguis/codeigniter-restserver) yang sudah diimplementasi khusus yang disesuaikan dengan kebutuhan kami, tetapi tetap mengikuti dasar-dasar dari [codeigniter-restserver](https://github.com/chriskacerguis/codeigniter-restserver).Pastikan untuk memeriksa versi terbaru di [sini](https://github.com/chriskacerguis/codeigniter-restserver) dan versi alternatif di [sini](https://github.com/ardisaurus/old-rest-ci).
+Proyek ini didasarkan pada [codeigniter-restserver](https://github.com/chriskacerguis/codeigniter-restserver) yang sudah diimplementasi khusus yang disesuaikan dengan kebutuhan kami, tetapi tetap mengikuti dasar-dasar dari [codeigniter-restserver](https://github.com/chriskacerguis/codeigniter-restserver). Pastikan untuk memeriksa versi terbaru di [sini](https://github.com/chriskacerguis/codeigniter-restserver) dan versi alternatif di [sini](https://github.com/ardisaurus/old-rest-ci).
 
 ## Kontribusi
 
