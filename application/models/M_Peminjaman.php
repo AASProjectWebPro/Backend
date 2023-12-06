@@ -6,10 +6,32 @@
             $query = $this->db->get('transaksi_peminjaman');
             return $query->result_array();
         }
-        function check_data($id)
+        function check_id_user($id)
+        {
+            $this->db->where("id", $id);
+            $query = $this->db->get('user');
+
+            if ($query->row()) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+        function check_id_transaksi($id)
         {
             $this->db->where("id", $id);
             $query = $this->db->get('transaksi_peminjaman');
+
+            if ($query->row()) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+        function check_id_buku($id)
+        {
+            $this->db->where("id", $id);
+            $query = $this->db->get('buku');
 
             if ($query->row()) {
                 return true;
@@ -32,7 +54,6 @@
                 return false;
             }
         }
-
         function update_data($id, $data)
         {
             $this->db->where("id", $id);
