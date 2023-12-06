@@ -86,8 +86,12 @@
             'id_user' => $this->post('id_user'),
             'id_buku' => $this->post('id_buku'),
             'tanggal_peminjaman' => $this->post('tanggal_peminjaman'),
-            'status' => $this->post('status')
+            'status' => $this->post('status'),
+            'tanggal_pengembalian'=>null
             );
+            if ($_POST["status"] == "Pengembalian"){
+                $data['tanggal_pengembalian'] = $this->post('tanggal_pengembalian');
+            }
             if($this->M_Peminjaman->insert_api($data)){
                 $response = array(
                     'status' => 201,
@@ -115,8 +119,12 @@
                 'id_user' => $this->put('id_user'),
                 'id_buku' => $this->put('id_buku'),
                 'tanggal_peminjaman' => $this->put('tanggal_peminjaman'),
-                'status' => $this->put('status')
+                'status' => $this->put('status'),
+                'tanggal_pengembalian'=>null
             );
+            if ($_POST["status"] == "Pengembalian"){
+                $data['tanggal_pengembalian'] = $this->put('tanggal_pengembalian');
+            }
             $id = $this->put('id');
             $this->M_Peminjaman->update_data($id,$data);
             $response = array(

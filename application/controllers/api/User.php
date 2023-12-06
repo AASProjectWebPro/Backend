@@ -112,7 +112,7 @@ class User extends REST_Controller
             );
             return $this->response($response,502);
         }
-        if($this->UserModel->delete($this->put('id'))){
+        if($this->UserModel->delete($this->delete('id'))){
             $response = array(
                 'status' => 201,
                 'message' => 'Success'
