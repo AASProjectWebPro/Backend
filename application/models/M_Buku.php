@@ -6,6 +6,15 @@
         $query = $this->db->get('buku');
         return $query->result_array();
     }
+    function get_stock_by_id($book_id)
+    {
+        $this->db->where('id', $book_id);
+        $query = $this->db->get('buku');
+
+        if ($query->num_rows() > 0) {
+            return $query->row()->stock;
+        }
+    }
     function fetch_single_data($id)
     {
         $this->db->where('id',$id);

@@ -44,7 +44,7 @@
         {
             $this->db->where('id',$id);
             $query = $this->db->get('transaksi_peminjaman');
-            return $query->row();
+            return $query->result_array();
         }
         function insert_api($data)
         {
