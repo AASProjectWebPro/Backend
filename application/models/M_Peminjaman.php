@@ -17,6 +17,7 @@
                 return false;
             }
         }
+
         function check_id_transaksi($id)
         {
             $this->db->where("id", $id);

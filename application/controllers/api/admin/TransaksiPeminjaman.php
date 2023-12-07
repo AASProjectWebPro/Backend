@@ -45,20 +45,6 @@
                 return false;
             }
         }
-       function validatePengembalian(){
-            if (isset($_POST["status"])) {
-                if ($_POST["status"] == "Pengembalian") {
-                    $this->form_validation->set_rules('tanggal_pengembalian', 'Tanggal Pengembalian', 'required|date');
-                }
-            }
-        }
-        function validate()
-        {
-            $this->form_validation->set_rules('id_user', 'ID User', 'numeric|callback_check_id_user');
-            $this->form_validation->set_rules('id_buku', 'ID Buku', 'numeric|callback_check_id_buku');
-            $this->form_validation->set_rules('tanggal_peminjaman', 'Tanggal Peminjaman', 'required|date');
-            $this->form_validation->set_rules('status', 'Status', 'required|in_list[Peminjaman,Pengembalian]');
-        }
 
         function index_get()
         {
@@ -72,8 +58,9 @@
         }
         function index_post()
         {
-            $this->validatePengembalian();
-            $this->validate();
+            $this->form_validation->set_rules('id_user', 'ID User', 'numeric|callback_check_id_user|is_unique[transaksi_peminjaman.id_user]');
+            $this->form_validation->set_rules('id_buku', 'ID Buku', 'numeric|callback_check_id_buku');
+            $this->form_validation->set_rules('tanggal_peminjaman', 'Tanggal Peminjaman', 'required|date');
             if ($this->form_validation->run() === FALSE) {
                 $error_array = $this->form_validation->error_array();
                 $response = array(
@@ -85,13 +72,8 @@
             $data = array(
             'id_user' => $this->post('id_user'),
             'id_buku' => $this->post('id_buku'),
-            'tanggal_peminjaman' => $this->post('tanggal_peminjaman'),
-            'status' => $this->post('status'),
-            'tanggal_pengembalian'=>null
+            'tanggal_peminjaman' => $this->post('tanggal_peminjaman')
             );
-            if ($_POST["status"] == "Pengembalian"){
-                $data['tanggal_pengembalian'] = $this->post('tanggal_pengembalian');
-            }
             if($this->M_Peminjaman->insert_api($data)){
                 $response = array(
                     'status' => 201,
@@ -101,39 +83,7 @@
             }
         }
 
-        function index_put()
-        {
-            $this->mengakaliFormValidationYangHanyaMendeteksiPostRequest();
-            $this->form_validation->set_rules('id', 'ID Transaksi', 'numeric|callback_check_id_transaksi');
-            $this->validate();
-            $this->validatePengembalian();
-            if ($this->form_validation->run() === FALSE) {
-                $error_array = $this->form_validation->error_array();
-                $response = array(
-                    'status' => 502,
-                    'message' => $error_array
-                );
-                return $this->response($response,502);
-            }
-            $data = array(
-                'id_user' => $this->put('id_user'),
-                'id_buku' => $this->put('id_buku'),
-                'tanggal_peminjaman' => $this->put('tanggal_peminjaman'),
-                'status' => $this->put('status'),
-                'tanggal_pengembalian'=>null
-            );
-            if ($_POST["status"] == "Pengembalian"){
-                $data['tanggal_pengembalian'] = $this->put('tanggal_pengembalian');
-            }
-            $id = $this->put('id');
-            $this->M_Peminjaman->update_data($id,$data);
-            $response = array(
-                'status' => 'success',
-                'status_code' => 201,
-            );
-            return $this->response($response,201);
-        }
-        function index_delete() {
+        function pengembalian_delete() {
             $this->mengakaliFormValidationYangHanyaMendeteksiPostRequest();
             $this->form_validation->set_rules('id', 'ID Transaksi', 'numeric|callback_check_id_transaksi');
             if ($this->form_validation->run() === FALSE) {
@@ -145,6 +95,7 @@
                 return $this->response($response,502);
             }
             $delete = $this->M_Peminjaman->delete_data($id = $this->delete('id'));
+
             $response = array(
                 'status' => 'success',
                 'status_code' => 200,
