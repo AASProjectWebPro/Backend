@@ -94,7 +94,7 @@
                 return $this->response($response,201);
             }
         }
-        function pengembalian_patch() {
+        function pengembalian_delete() {
             $this->mengakaliFormValidationYangHanyaMendeteksiPostRequest();
             $this->form_validation->set_rules('tanggal_pengembalian', 'Tanggal Pengembalian', 'required|date');
             $this->form_validation->set_rules('id', 'ID Transaksi', 'numeric|callback_check_id_transaksi');
@@ -106,14 +106,14 @@
                 );
                 return $this->response($response,502);
             }
-            $dataTmp =$this->M_Peminjaman->fetch_single_data($this->patch('id'));
+            $dataTmp =$this->M_Peminjaman->fetch_single_data($this->delete('id'));
             $data = array(
                 'id_user' => $dataTmp[0]['id_user'],
                 'id_buku' => $dataTmp[0]['id_buku'],
                 'tanggal_peminjaman' => $dataTmp[0]['tanggal_peminjaman'],
-                'tanggal_pengembalian' => $this->patch('tanggal_pengembalian')
+                'tanggal_pengembalian' => $this->delete('tanggal_pengembalian')
             );
-            $delete = $this->M_Peminjaman->delete_data($this->patch('id'));
+            $delete = $this->M_Peminjaman->delete_data($this->delete('id'));
             $stockBukuSaatIni=$this->M_Buku->get_stock_by_id($dataTmp[0]['id_buku']);
             $kurangiSatuStockBuku=$this->M_Buku->update_data($dataTmp[0]['id_buku'],array('stock' => $stockBukuSaatIni+1));
             $response = array(
