@@ -13,12 +13,14 @@
             $this->load->database();
             $this->load->model('M_Peminjaman');
             //load book model
+            $this->load->model('M_Buku');
             $this->load->library('form_validation');
         }
         function index_get(){
             ///get by id jwt payload
         }
         function index_post(){
+            //validate user not in status "peminjam"
             //add with id from jwt
             //decrese book stock
         }
