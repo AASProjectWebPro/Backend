@@ -93,13 +93,6 @@
                 );
                 return $this->response($response,201);
             }
-            // if($this->PengembalianModel->insert($data)){
-            //     $response = array(
-            //         'status' => 201,
-            //         'message' => 'Succes'
-            //     );
-            //     return $this->response($response,201);
-            // }
         }
         function pengembalian_delete() {
             $this->mengakaliFormValidationYangHanyaMendeteksiPostRequest();
