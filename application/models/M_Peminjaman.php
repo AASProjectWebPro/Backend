@@ -17,6 +17,7 @@
                 return false;
             }
         }
+
         function check_id_transaksi($id)
         {
             $this->db->where("id", $id);
@@ -43,7 +44,7 @@
         {
             $this->db->where('id',$id);
             $query = $this->db->get('transaksi_peminjaman');
-            return $query->row();
+            return $query->result_array();
         }
         function insert_api($data)
         {
