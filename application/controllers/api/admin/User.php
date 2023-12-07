@@ -24,8 +24,16 @@ class User extends REST_Controller
         $this->form_validation->set_rules('username', 'Username', 'required|trim|is_unique[user.username]');
         $this->form_validation->set_rules('email', 'Email', 'required|trim|valid_email|is_unique[user.email]');
         $this->form_validation->set_rules('password', 'Password', 'required|min_length[6]');
-        $this->form_validation->set_rules('nomor_telepon', 'Phone Number', 'required|trim|numeric|is_unique[user.nomor_telepon]');
+        $this->form_validation->set_rules('nomor_telepon', 'Phone Number', 'required|trim|numeric|is_unique[user.nomor_telepon]|max_length[16]');
         $this->form_validation->set_rules('alamat', 'Adress', 'required|trim');
+    }
+    function checkUserExistOnPeminjam($id){
+        if(!($this->UserModel->checkUserExistOnPeminjam($id))){
+            return true;
+        } else {
+            $this->form_validation->set_message('checkUserExistOnPeminjam', 'The user still borrow the book');
+            return false;
+        }
     }
     function index_get()
     {
@@ -75,8 +83,8 @@ class User extends REST_Controller
     function index_put()
     {
         $this->mengakaliFormValidationYangHanyaMendeteksiPostRequest();
-        $this->validate();
         $this->form_validation->set_rules('id', 'ID', 'required|callback_ifExist');
+        $this->validate();
         if ($this->form_validation->run() === FALSE) {
             $error_array = $this->form_validation->error_array();
             $response = array(
@@ -103,7 +111,7 @@ class User extends REST_Controller
     function index_delete()
     {
         $this->mengakaliFormValidationYangHanyaMendeteksiPostRequest();
-        $this->form_validation->set_rules('id', 'ID', 'required|callback_ifExist');
+        $this->form_validation->set_rules('id', 'ID', 'required|callback_ifExist|callback_checkUserExistOnPeminjam');
         if ($this->form_validation->run() === FALSE) {
             $error_array = $this->form_validation->error_array();
             $response = array(

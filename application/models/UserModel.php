@@ -30,6 +30,14 @@ class UserModel extends CI_Model
             return false;
         }
     }
+    function checkUserExistOnPeminjam($user_id){
+        $this->db->where('id_user', $user_id);
+        $query = $this->db->get("transaksi_peminjaman");
+        if ($query->num_rows() > 0) {
+            return true;
+        }
+        return false;
+    }
     function update($id, $data)
     {
         $this->db->where('id', $id);
