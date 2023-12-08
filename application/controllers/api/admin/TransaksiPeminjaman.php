@@ -115,7 +115,8 @@
             );
             $delete = $this->M_Peminjaman->delete_data($this->delete('id'));
             $stockBukuSaatIni=$this->M_Buku->get_stock_by_id($dataTmp[0]['id_buku']);
-            $kurangiSatuStockBuku=$this->M_Buku->update_data($dataTmp[0]['id_buku'],array('stock' => $stockBukuSaatIni+1));
+            $TambahSatuStockBuku=$this->M_Buku->update_data($dataTmp[0]['id_buku'],array('stock' => $stockBukuSaatIni+1));
+            $PengembalianBuku = $this->PengembalianModel->insert($data);
             $response = array(
                 'status' => 'success',
                 'status_code' => 200,
