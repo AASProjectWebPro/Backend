@@ -10,10 +10,24 @@ class User extends REST_Controller
     function __construct()
     {
         parent::__construct();
+        header('Access-Control-Allow-Origin:*');
+        header("Access-Control-Allow-Headers:X-API-KEY,Origin,X-Requested-With,Content-Type,Accept,Access-Control-Request-Method,Authorization");
+        header("Access-Control-Allow-Methods:GET,POST,OPTIONS,PUT,DELETE");
+        $method = $_SERVER['REQUEST_METHOD'];
+        if ($method == "OPTIONS") {
+            die();
+        }
         $this->load->database();
         $this->load->model('UserModel');
         $this->load->library('form_validation');
     }
+    public function options_get() {
+        header("Access-Control-Allow-Origin: *");
+        header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
+        header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+        exit();
+    }
+
     function mengakaliFormValidationYangHanyaMendeteksiPostRequest(){
         $_SERVER['REQUEST_METHOD'] = 'POST';
         $putData = $this->input->input_stream();
