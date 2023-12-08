@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 
-
+require_once FCPATH . 'vendor/autoload.php';
 use Firebase\JWT\JWT as JWTLib;
 use Firebase\JWT\Key;
 
@@ -18,7 +18,7 @@ class Jwt
     public function encode($data)
     {
         $key = $this->CI->config->item('jwt_key');
-        $algortima = $this->CI->config->item('jwt_algorithm');
+        $algortima = $this->CI->config->item('jwt_algoritma');
         $issuer = $this->CI->config->item('jwt_issuer');
         $audience = $this->CI->config->item('jwt_audience');
         $expire = $this->CI->config->item('jwt_expire');
@@ -30,5 +30,31 @@ class Jwt
             'data' => $data,
         ];
         return JWTLib::encode($token, $key, $algortima);
+    }
+    public function decode($param) {
+        $key = $this->CI->config->item('jwt_key');
+        $algorithm = $this->CI->config->item('jwt_algoritma');
+
+        if(isset($param)) {
+            $authHeader = $param;
+            $arr = explode("Bearer ", $authHeader);
+            if (count($arr) > 1) {
+                $token = $arr[1];
+                if ($token) {
+                    try {
+                        $decoded = JWTLib::decode($token, new Key($key, $algorithm));
+                        if ($decoded) {
+                            return true;
+                        }
+                    } catch (\Exception $e) {
+                        return false;
+                    }
+                }
+            }else {
+                return false;
+            }
+        } else {
+            return false;
+        }
     }
 }

@@ -20,6 +20,7 @@ class User extends REST_Controller
         $this->load->database();
         $this->load->model('UserModel');
         $this->load->library('form_validation');
+        $this->load->library('jwt');
     }
     public function options_get() {
         header("Access-Control-Allow-Origin: *");
@@ -51,6 +52,25 @@ class User extends REST_Controller
     }
     function index_get()
     {
+        if (isset($this->input->request_headers()['Authorization'])){
+            if ($this->jwt->decode($this->input->request_headers()['Authorization'])==false) {
+                return $this->response(
+                    array(
+                        'kode' => '401',
+                        'pesan' => 'signature tidak sesuai',
+                        'data' => []
+                    ), 401
+                );
+            }
+        } else{
+            return $this->response(
+                array(
+                    'kode' => '401',
+                    'pesan' => 'Unauthorized',
+                    'data' => []
+                ), 401
+            );
+        }
         $id = $this->get('id');
         if ($id == '') {
             $data = $this->UserModel->read();
@@ -61,6 +81,25 @@ class User extends REST_Controller
     }
     function index_post()
     {
+        if (isset($this->input->request_headers()['Authorization'])){
+            if ($this->jwt->decode($this->input->request_headers()['Authorization'])==false) {
+                return $this->response(
+                    array(
+                        'kode' => '401',
+                        'pesan' => 'signature tidak sesuai',
+                        'data' => []
+                    ), 401
+                );
+            }
+        } else{
+            return $this->response(
+                array(
+                    'kode' => '401',
+                    'pesan' => 'Unauthorized',
+                    'data' => []
+                ), 401
+            );
+        }
         $this->validate();
         if ($this->form_validation->run() === FALSE) {
             $error_array = $this->form_validation->error_array();
@@ -96,6 +135,25 @@ class User extends REST_Controller
     }
     function index_put()
     {
+        if (isset($this->input->request_headers()['Authorization'])){
+            if ($this->jwt->decode($this->input->request_headers()['Authorization'])==false) {
+                return $this->response(
+                    array(
+                        'kode' => '401',
+                        'pesan' => 'signature tidak sesuai',
+                        'data' => []
+                    ), 401
+                );
+            }
+        } else{
+            return $this->response(
+                array(
+                    'kode' => '401',
+                    'pesan' => 'Unauthorized',
+                    'data' => []
+                ), 401
+            );
+        }
         $this->mengakaliFormValidationYangHanyaMendeteksiPostRequest();
         $this->form_validation->set_rules('id', 'ID', 'required|callback_ifExist');
         $this->validate();
@@ -124,6 +182,25 @@ class User extends REST_Controller
     }
     function index_delete()
     {
+        if (isset($this->input->request_headers()['Authorization'])){
+            if ($this->jwt->decode($this->input->request_headers()['Authorization'])==false) {
+                return $this->response(
+                    array(
+                        'kode' => '401',
+                        'pesan' => 'signature tidak sesuai',
+                        'data' => []
+                    ), 401
+                );
+            }
+        } else{
+            return $this->response(
+                array(
+                    'kode' => '401',
+                    'pesan' => 'Unauthorized',
+                    'data' => []
+                ), 401
+            );
+        }
         $this->mengakaliFormValidationYangHanyaMendeteksiPostRequest();
         $this->form_validation->set_rules('id', 'ID', 'required|callback_ifExist|callback_checkUserExistOnPeminjam');
         if ($this->form_validation->run() === FALSE) {
