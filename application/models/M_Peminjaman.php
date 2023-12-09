@@ -3,7 +3,13 @@
     {
         function fetch_all()
         {
-            $query = $this->db->get('transaksi_peminjaman');
+            $this->db->select('transaksi_peminjaman.id, user.username,user.email, buku.isbn,buku.judul, transaksi_peminjaman.tanggal_peminjaman');
+            $this->db->from('transaksi_peminjaman');
+            $this->db->join('user', 'transaksi_peminjaman.id_user = user.id');
+            $this->db->join('buku', 'transaksi_peminjaman.id_buku = buku.id');
+
+            $query = $this->db->get();
+
             return $query->result_array();
         }
         function check_id_user($id)
@@ -14,6 +20,25 @@
             if ($query->row()) {
                 return true;
             } else {
+                return false;
+            }
+        }
+        function checkISBN($isbn)
+        {
+            $this->db->where('isbn', $isbn);
+            $query = $this->db->get('buku');
+            if ($query->num_rows() > 0) {
+                return $query->row()->id;
+            }else{
+                return false;
+            }
+        }
+        function checkUSERNAME($username){
+            $this->db->where('username', $username);
+            $query = $this->db->get('user');
+            if ($query->num_rows() > 0) {
+                return $query->row()->id;
+            }else{
                 return false;
             }
         }
