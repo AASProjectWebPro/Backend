@@ -27,6 +27,19 @@
             header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
             exit();
         }
+        function checkHistory($id){
+            if($this->PengembalianModel->checkHistory($id)){
+                return true;
+            } else {
+                $this->form_validation->set_message('checkHistory', 'The id history not found');
+                return false;
+            }
+        }
+        function mengakaliFormValidationYangHanyaMendeteksiPostRequest(){
+            $_SERVER['REQUEST_METHOD'] = 'POST';
+            $putData = $this->input->input_stream();
+            $_POST = $putData;
+        }
         function index_get() {
             $id = $this->get('id');
             if ($id) {
@@ -39,6 +52,26 @@
             } else {
                 $dataAll = $this->PengembalianModel->read();
                 $this->response($dataAll, 200);
+            }
+        }
+        function index_delete()
+        {
+            $this->mengakaliFormValidationYangHanyaMendeteksiPostRequest();
+            $this->form_validation->set_rules('id', 'ID', 'required|callback_checkHistory');
+            if ($this->form_validation->run() === FALSE) {
+                $error_array = $this->form_validation->error_array();
+                $response = array(
+                    'status' => 502,
+                    'message' => $error_array
+                );
+                return $this->response($response,502);
+            }
+            if($this->PengembalianModel->delete($this->delete('id'))){
+                $response = array(
+                    'status' => 201,
+                    'message' => 'Success'
+                );
+                return $this->response($response,201);
             }
         }
         

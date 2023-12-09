@@ -2,6 +2,14 @@
 class PengembalianModel extends CI_Model
 {
     protected $table = "history_pengembalian";
+    function checkHistory($id){
+        $this->db->where('id', $id);
+        $query = $this->db->get($this->table);
+        if ($query->num_rows() > 0) {
+            return true;
+        }
+        return false;
+    }
     function read($id = '')
     {
         if ($id) {
@@ -15,6 +23,16 @@ class PengembalianModel extends CI_Model
     {
         $this->db->insert($this->table, $data);
         if ($this->db->affected_rows()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    function delete($id)
+    {
+        $this->db->where("id", $id);
+        $this->db->delete($this->table);
+        if ($this->db->affected_rows() > 0) {
             return true;
         } else {
             return false;
