@@ -20,6 +20,7 @@
             $this->load->model('M_Peminjaman');
             $this->load->model('PengembalianModel');
             $this->load->library('form_validation');
+            $this->load->library('jwt');
         }
         public function options_get() {
             header("Access-Control-Allow-Origin: *");
@@ -41,6 +42,25 @@
             $_POST = $putData;
         }
         function index_get() {
+            if (isset($this->input->request_headers()['Authorization'])){
+                if ($this->jwt->decode($this->input->request_headers()['Authorization'])==false) {
+                    return $this->response(
+                        array(
+                            'kode' => '401',
+                            'pesan' => 'signature tidak sesuai',
+                            'data' => []
+                        ), 401
+                    );
+                }
+            } else{
+                return $this->response(
+                    array(
+                        'kode' => '401',
+                        'pesan' => 'Unauthorized',
+                        'data' => []
+                    ), 401
+                );
+            }
             $id = $this->get('id');
             if ($id) {
                 $data = $this->PengembalianModel->read($id);
@@ -56,6 +76,25 @@
         }
         function index_delete()
         {
+            if (isset($this->input->request_headers()['Authorization'])){
+                if ($this->jwt->decode($this->input->request_headers()['Authorization'])==false) {
+                    return $this->response(
+                        array(
+                            'kode' => '401',
+                            'pesan' => 'signature tidak sesuai',
+                            'data' => []
+                        ), 401
+                    );
+                }
+            } else{
+                return $this->response(
+                    array(
+                        'kode' => '401',
+                        'pesan' => 'Unauthorized',
+                        'data' => []
+                    ), 401
+                );
+            }
             $this->mengakaliFormValidationYangHanyaMendeteksiPostRequest();
             $this->form_validation->set_rules('id', 'ID', 'required|callback_checkHistory');
             if ($this->form_validation->run() === FALSE) {
