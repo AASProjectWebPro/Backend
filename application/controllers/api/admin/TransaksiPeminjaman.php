@@ -16,6 +16,7 @@
                 die();
             }
             $this->load->database();
+            $this->load->model('UserModel');
             $this->load->model('M_Buku');
             $this->load->model('M_Peminjaman');
             $this->load->model('PengembalianModel');
@@ -83,7 +84,6 @@
         {
             $this->form_validation->set_rules('id_user', 'ID User', 'numeric|callback_check_id_user|is_unique[transaksi_peminjaman.id_user]');
             $this->form_validation->set_rules('id_buku', 'ID Buku', 'numeric|callback_check_id_buku|callback_get_stock_by_id');
-            $this->form_validation->set_rules('tanggal_peminjaman', 'Tanggal Peminjaman', 'required|date');
             if ($this->form_validation->run() === FALSE) {
                 $error_array = $this->form_validation->error_array();
                 $response = array(
@@ -95,7 +95,7 @@
             $data = array(
             'id_user' => $this->post('id_user'),
             'id_buku' => $this->post('id_buku'),
-            'tanggal_peminjaman' => $this->post('tanggal_peminjaman')
+            'tanggal_peminjaman' => date('Y-m-d')
             );
             $stockBukuSaatIni=$this->M_Buku->get_stock_by_id($this->post('id_buku'));
             $kurangiSatuStockBuku=$this->M_Buku->update_data($this->post('id_buku'),array('stock' => $stockBukuSaatIni-1));
@@ -109,7 +109,6 @@
         }
         function pengembalian_delete() {
             $this->mengakaliFormValidationYangHanyaMendeteksiPostRequest();
-            $this->form_validation->set_rules('tanggal_pengembalian', 'Tanggal Pengembalian', 'required|date');
             $this->form_validation->set_rules('id', 'ID Transaksi', 'numeric|callback_check_id_transaksi');
             if ($this->form_validation->run() === FALSE) {
                 $error_array = $this->form_validation->error_array();
@@ -120,11 +119,13 @@
                 return $this->response($response,502);
             }
             $dataTmp =$this->M_Peminjaman->fetch_single_data($this->delete('id'));
+            $isbn = $this->M_Buku->get_isbn_by_id($dataTmp[0]['id_buku']);
+            $email= $this->UserModel->get_email_by_id($dataTmp[0]['id_user']);
             $data = array(
-                'id_user' => $dataTmp[0]['id_user'],
-                'id_buku' => $dataTmp[0]['id_buku'],
+                'isbn_buku' => $isbn,
+                'email' => $email,
                 'tanggal_peminjaman' => $dataTmp[0]['tanggal_peminjaman'],
-                'tanggal_pengembalian' => $this->delete('tanggal_pengembalian')
+                'tanggal_pengembalian' => date('Y-m-d')
             );
             $delete = $this->M_Peminjaman->delete_data($this->delete('id'));
             $stockBukuSaatIni=$this->M_Buku->get_stock_by_id($dataTmp[0]['id_buku']);

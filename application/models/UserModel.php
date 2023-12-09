@@ -12,6 +12,15 @@ class UserModel extends CI_Model
         }
         return false;
     }
+    function get_email_by_id($book_id)
+    {
+        $this->db->where('id', $book_id);
+        $query = $this->db->get($this->table);
+
+        if ($query->num_rows() > 0) {
+            return $query->row()->email;
+        }
+    }
     function read($id='')
     {
         if($id){

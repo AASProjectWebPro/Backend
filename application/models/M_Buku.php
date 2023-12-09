@@ -15,6 +15,15 @@
             return $query->row()->stock;
         }
     }
+    function get_isbn_by_id($book_id)
+    {
+        $this->db->where('id', $book_id);
+        $query = $this->db->get('buku');
+
+        if ($query->num_rows() > 0) {
+            return $query->row()->isbn;
+        }
+    }
     function fetch_single_data($id)
     {
         $this->db->where('id',$id);
