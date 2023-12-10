@@ -37,12 +37,12 @@ class buku extends REST_Controller
     {
         $this->form_validation->set_rules('isbn', 'Isbn' ,'required|trim|is_unique[buku.isbn]');
         $this->form_validation->set_rules('judul', 'Judul', 'required|trim|min_length[5]');
-        $this->form_validation->set_rules('pengarang', 'Pengarang', 'trim|min_length[5]');
-        $this->form_validation->set_rules('penerbit', 'Penerbit', 'trim|min_length[5]');
-        $this->form_validation->set_rules('tahun_terbit', 'Tahun Terbit', 'trim|min_length[4]|numeric');
+        $this->form_validation->set_rules('pengarang', 'Pengarang', 'required|trim|min_length[5]');
+        $this->form_validation->set_rules('penerbit', 'Penerbit', 'required|trim|min_length[5]');
+        $this->form_validation->set_rules('tahun_terbit', 'Tahun Terbit', 'required|trim|min_length[4]|numeric');
         $this->form_validation->set_rules('jenis', 'Jenis', 'required|trim|min_length[4]');
-        $this->form_validation->set_rules('deskripsi', 'Deskripsi', 'trim|min_length[5]');
-        $this->form_validation->set_rules('stock', 'Stock', 'trim|numeric');
+        $this->form_validation->set_rules('deskripsi', 'Deskripsi', 'required|trim|min_length[5]');
+        $this->form_validation->set_rules('stock', 'Stock', 'required|trim|numeric');
     }
 
     function index_get()
@@ -185,6 +185,14 @@ class buku extends REST_Controller
             return $this->response($response,201);
         }
     }
+    function checkBukuExistOnPeminjam($id){
+        if(!($this->M_Buku->checkBukuExistOnPeminjam($id))){
+            return true;
+        } else {
+            $this->form_validation->set_message('checkBukuExistOnPeminjam', 'This book is still on loan.');
+            return false;
+        }
+    }
     function index_delete(){
         if(isset($this->input->request_headers()['Authorization'])){
             if ($this->jwt->decode($this->input->request_headers()['Authorization'])==false) {
@@ -206,7 +214,15 @@ class buku extends REST_Controller
             );
         }
         $this->mengakaliFormValidationYangHanyaMendeteksiPostRequest();
-        $this->form_validation->set_rules('id', 'ID', 'required|callback_ifExist');
+        $this->form_validation->set_rules('id', 'ID', 'required|callback_ifExist|callback_checkBukuExistOnPeminjam');
+        if($this->form_validation->run() === false){
+            $error_array = $this->form_validation->error_array();
+            $response = array(
+                'status' => 502,
+                'message' => $error_array
+            );
+            return $this->response($response,502);
+        }
         if($this->M_Buku->delete_data($this->delete('id'))){
             $response = array(
                 'status' => 201,

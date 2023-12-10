@@ -15,6 +15,14 @@
             return $query->row()->stock;
         }
     }
+    function checkBukuExistOnPeminjam($buku){
+        $this->db->where('id_buku', $buku);
+        $query = $this->db->get("transaksi_peminjaman");
+        if ($query->num_rows() > 0) {
+            return true;
+        }
+        return false;
+    }
     function get_isbn_by_id($book_id)
     {
         $this->db->where('id', $book_id);
