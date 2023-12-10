@@ -2,9 +2,14 @@
 {
     function fetch_all()
     {
-        $this->db->order_by('id','ASC');
+        $this->db->order_by('id', 'ASC');
         $query = $this->db->get('buku');
-        return $query->result_array();
+        $result = $query->result_array();
+        $this->load->helper('url');
+        foreach ($result as &$row) {
+            $row['gambar'] = base_url().'/upload/' . $row['gambar'];
+        }
+        return $result;
     }
     function get_stock_by_id($book_id)
     {

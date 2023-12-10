@@ -30,6 +30,7 @@ class buku extends REST_Controller
     function mengakaliFormValidationYangHanyaMendeteksiPostRequest(){
         $_SERVER['REQUEST_METHOD'] = 'POST';
         $putData = $this->input->input_stream();
+//        var_dump($putData);
         $_POST = $putData;
     }
 
@@ -75,7 +76,23 @@ class buku extends REST_Controller
         }
         $this->response($data, 200);
     }
-
+    public function checkFileExtension($str) {
+        if($str==="jpg" or $str ==="png"){
+           return true;
+        }else{
+            $this->form_validation->set_message('checkFileExtension', 'Invalid file extension. Allowed extensions: jpg or png');
+            return false;
+        }
+    }
+    public function checkFileSize($str) {
+        $max_file_size = 6 * 1024 * 1024;
+        if ($str > $max_file_size) {
+            $this->form_validation->set_message('checkFileSize', 'File size exceeds the allowed limit (6 MB).');
+            return false;
+        } else {
+            return true;
+        }
+    }
     function index_post()
     {
         if(isset($this->input->request_headers()['Authorization'])){
@@ -98,6 +115,17 @@ class buku extends REST_Controller
             );
         }
         $this->validate();
+
+        //validasi file:v
+        if($_FILES["file"]["name"]!=''){
+            $_POST['file']=$_FILES["file"]["name"];
+            $_POST['file_extension']=pathinfo($_POST['file'], PATHINFO_EXTENSION);
+            $_POST['file_size']=$_FILES["file"]["size"];
+            $this->form_validation->set_rules('file_extension', 'File Extension', 'callback_checkFileExtension');
+            $this->form_validation->set_rules('file_size', 'File Extension', 'callback_checkFileSize');
+        }else{
+            $this->form_validation->set_rules('file', 'File', 'required');
+        }
         if($this->form_validation->run() === false){
             $error_array = $this->form_validation->error_array();
             $response = array(
@@ -106,6 +134,10 @@ class buku extends REST_Controller
             );
             return $this->response($response,502);
         }
+        //save file :v
+        $filename = time().'_'.uniqid().".".pathinfo($_FILES["file"]["name"], PATHINFO_EXTENSION);
+        move_uploaded_file($_FILES["file"]["tmp_name"], FCPATH.'/upload/'.$filename);
+
         $data = array(
             'isbn' => $this->post('isbn'),
             'judul' => $this->post('judul'),
@@ -114,7 +146,8 @@ class buku extends REST_Controller
             'tahun_terbit' => trim($this->post('tahun_terbit')),
             'jenis' => $this->post('jenis'),
             'deskripsi' => $this->post('deskripsi'),
-            'stock' => $this->post('stock')
+            'stock' => $this->post('stock'),
+            'gambar'=>$filename
         );
 
         if($this->M_Buku->insert_api($data)){
@@ -134,57 +167,57 @@ class buku extends REST_Controller
             return false;
         }
     }
-    
-    function index_put(){
-        if(isset($this->input->request_headers()['Authorization'])){
-            if ($this->jwt->decode($this->input->request_headers()['Authorization'])==false) {
-                return $this->response(
-                    array(
-                        'kode' => '401',
-                        'pesan' => 'signature tidak sesuai',
-                        'data' => []
-                    ), 401
-                );
-            }
-        } else{
-            return $this->response(
-                array(
-                    'kode' => '401',
-                    'pesan' => 'Unauthorized',
-                    'data' => []
-                ), 401
-            );
-        }
-        $this->mengakaliFormValidationYangHanyaMendeteksiPostRequest();
-        $this->validate();
-        $this->form_validation->set_rules('id', 'ID', 'required|callback_ifExist');
-        if($this->form_validation->run() === false){
-            $error_array = $this->form_validation->error_array();
-            $response = array(
-                'status' => 502,
-                'message' => $error_array
-            );
-            return $this->response($response,502);
-        }
-        $data = array(
-            'isbn' => $this->put('isbn'),
-            'judul' => $this->put('judul'),
-            'pengarang' => $this->put('pengarang'),
-            'penerbit' => $this->put('penerbit'),
-            'tahun_terbit' => $this->put('tahun_terbit'),
-            'jenis' => $this->put('jenis'),
-            'deskripsi' =>$this->put('deskripsi'),
-            'stock' => $this->put('stock')
-        );
-
-        if($this->M_Buku->update_data($this->put('id'),$data)){
-            $response = array(
-                'status' => 201,
-                'message' => 'Succes'
-            );
-            return $this->response($response,201);
-        }
-    }
+//
+//    function index_put(){
+//        if(isset($this->input->request_headers()['Authorization'])){
+//            if ($this->jwt->decode($this->input->request_headers()['Authorization'])==false) {
+//                return $this->response(
+//                    array(
+//                        'kode' => '401',
+//                        'pesan' => 'signature tidak sesuai',
+//                        'data' => []
+//                    ), 401
+//                );
+//            }
+//        } else{
+//            return $this->response(
+//                array(
+//                    'kode' => '401',
+//                    'pesan' => 'Unauthorized',
+//                    'data' => []
+//                ), 401
+//            );
+//        }
+//        $this->mengakaliFormValidationYangHanyaMendeteksiPostRequest();
+//        $this->validate();
+//        $this->form_validation->set_rules('id', 'ID', 'required|callback_ifExist');
+//        if($this->form_validation->run() === false){
+//            $error_array = $this->form_validation->error_array();
+//            $response = array(
+//                'status' => 502,
+//                'message' => $error_array
+//            );
+//            return $this->response($response,502);
+//        }
+//        $data = array(
+//            'isbn' => $this->put('isbn'),
+//            'judul' => $this->put('judul'),
+//            'pengarang' => $this->put('pengarang'),
+//            'penerbit' => $this->put('penerbit'),
+//            'tahun_terbit' => $this->put('tahun_terbit'),
+//            'jenis' => $this->put('jenis'),
+//            'deskripsi' =>$this->put('deskripsi'),
+//            'stock' => $this->put('stock')
+//        );
+//
+//        if($this->M_Buku->update_data($this->put('id'),$data)){
+//            $response = array(
+//                'status' => 201,
+//                'message' => 'Succes'
+//            );
+//            return $this->response($response,201);
+//        }
+//    }
     function checkBukuExistOnPeminjam($id){
         if(!($this->M_Buku->checkBukuExistOnPeminjam($id))){
             return true;
@@ -224,6 +257,71 @@ class buku extends REST_Controller
             return $this->response($response,502);
         }
         if($this->M_Buku->delete_data($this->delete('id'))){
+            $response = array(
+                'status' => 201,
+                'message' => 'Succes'
+            );
+            return $this->response($response,201);
+        }
+    }
+    function edit_post()
+    {
+        if(isset($this->input->request_headers()['Authorization'])){
+            if ($this->jwt->decode($this->input->request_headers()['Authorization'])==false) {
+                return $this->response(
+                    array(
+                        'kode' => '401',
+                        'pesan' => 'signature tidak sesuai',
+                        'data' => []
+                    ), 401
+                );
+            }
+        } else{
+            return $this->response(
+                array(
+                    'kode' => '401',
+                    'pesan' => 'Unauthorized',
+                    'data' => []
+                ), 401
+            );
+        }
+        $this->form_validation->set_rules('id', 'ID', 'required|callback_ifExist');
+        $this->validate();
+        //validasi file:v
+        if($_FILES["file"]["name"]!=''){
+            $_POST['file']=$_FILES["file"]["name"];
+            $_POST['file_extension']=pathinfo($_POST['file'], PATHINFO_EXTENSION);
+            $_POST['file_size']=$_FILES["file"]["size"];
+            $this->form_validation->set_rules('file_extension', 'File Extension', 'callback_checkFileExtension');
+            $this->form_validation->set_rules('file_size', 'File Extension', 'callback_checkFileSize');
+        }else{
+            $this->form_validation->set_rules('file', 'File', 'required');
+        }
+        if($this->form_validation->run() === false){
+            $error_array = $this->form_validation->error_array();
+            $response = array(
+                'status' => 502,
+                'message' => $error_array
+            );
+            return $this->response($response,502);
+        }
+        //save file :v
+        $filename = time().'_'.uniqid().".".pathinfo($_FILES["file"]["name"], PATHINFO_EXTENSION);
+        move_uploaded_file($_FILES["file"]["tmp_name"], FCPATH.'/upload/'.$filename);
+
+        $data = array(
+            'isbn' => $this->post('isbn'),
+            'judul' => $this->post('judul'),
+            'pengarang' => $this->post('pengarang'),
+            'penerbit' => $this->post('penerbit'),
+            'tahun_terbit' => trim($this->post('tahun_terbit')),
+            'jenis' => $this->post('jenis'),
+            'deskripsi' => $this->post('deskripsi'),
+            'stock' => $this->post('stock'),
+            'gambar'=>$filename
+        );
+
+        if($this->M_Buku->update_data($_POST['id'],$data)){
             $response = array(
                 'status' => 201,
                 'message' => 'Succes'
