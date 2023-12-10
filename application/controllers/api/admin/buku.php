@@ -16,6 +16,7 @@ class buku extends REST_Controller
             die();
         }
         $this->load->database('');
+        $this->load->library('jwt');
         $this->load->model('M_Buku');
         $this->load->library('form_validation');
     }
@@ -46,6 +47,25 @@ class buku extends REST_Controller
 
     function index_get()
     {
+        if(isset($this->input->request_headers()['Authorization'])){
+            if ($this->jwt->decode($this->input->request_headers()['Authorization'])==false) {
+                return $this->response(
+                    array(
+                        'kode' => '401',
+                        'pesan' => 'signature tidak sesuai',
+                        'data' => []
+                    ), 401
+                );
+            }
+        } else{
+            return $this->response(
+                array(
+                    'kode' => '401',
+                    'pesan' => 'Unauthorized',
+                    'data' => []
+                ), 401
+            );
+        }
         $id = $this->get('id');
         if ($id == '')
         {
@@ -55,8 +75,28 @@ class buku extends REST_Controller
         }
         $this->response($data, 200);
     }
+
     function index_post()
     {
+        if(isset($this->input->request_headers()['Authorization'])){
+            if ($this->jwt->decode($this->input->request_headers()['Authorization'])==false) {
+                return $this->response(
+                    array(
+                        'kode' => '401',
+                        'pesan' => 'signature tidak sesuai',
+                        'data' => []
+                    ), 401
+                );
+            }
+        } else{
+            return $this->response(
+                array(
+                    'kode' => '401',
+                    'pesan' => 'Unauthorized',
+                    'data' => []
+                ), 401
+            );
+        }
         $this->validate();
         if($this->form_validation->run() === false){
             $error_array = $this->form_validation->error_array();
@@ -94,7 +134,27 @@ class buku extends REST_Controller
             return false;
         }
     }
+    
     function index_put(){
+        if(isset($this->input->request_headers()['Authorization'])){
+            if ($this->jwt->decode($this->input->request_headers()['Authorization'])==false) {
+                return $this->response(
+                    array(
+                        'kode' => '401',
+                        'pesan' => 'signature tidak sesuai',
+                        'data' => []
+                    ), 401
+                );
+            }
+        } else{
+            return $this->response(
+                array(
+                    'kode' => '401',
+                    'pesan' => 'Unauthorized',
+                    'data' => []
+                ), 401
+            );
+        }
         $this->mengakaliFormValidationYangHanyaMendeteksiPostRequest();
         $this->validate();
         $this->form_validation->set_rules('id', 'ID', 'required|callback_ifExist');
@@ -126,6 +186,25 @@ class buku extends REST_Controller
         }
     }
     function index_delete(){
+        if(isset($this->input->request_headers()['Authorization'])){
+            if ($this->jwt->decode($this->input->request_headers()['Authorization'])==false) {
+                return $this->response(
+                    array(
+                        'kode' => '401',
+                        'pesan' => 'signature tidak sesuai',
+                        'data' => []
+                    ), 401
+                );
+            }
+        } else{
+            return $this->response(
+                array(
+                    'kode' => '401',
+                    'pesan' => 'Unauthorized',
+                    'data' => []
+                ), 401
+            );
+        }
         $this->mengakaliFormValidationYangHanyaMendeteksiPostRequest();
         $this->form_validation->set_rules('id', 'ID', 'required|callback_ifExist');
         if($this->M_Buku->delete_data($this->delete('id'))){
