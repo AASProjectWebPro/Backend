@@ -31,10 +31,9 @@ class Jwt
         ];
         return JWTLib::encode($token, $key, $algortima);
     }
-    public function decode($param) {
+    public function decodeAdmin($param) {
         $key = $this->CI->config->item('jwt_key');
         $algorithm = $this->CI->config->item('jwt_algoritma');
-
         if(isset($param)) {
             $authHeader = $param;
             $arr = explode("Bearer ", $authHeader);
@@ -43,6 +42,10 @@ class Jwt
                 if ($token) {
                     try {
                         $decoded = JWTLib::decode($token, new Key($key, $algorithm));
+                        $decodedData=json_decode(base64_decode(explode('.', $token)[1]))->data->role;
+                        if ($decodedData!=="admin"){ //khusus jwt untuk admin
+                            return false;
+                        }
                         if ($decoded) {
                             return true;
                         }

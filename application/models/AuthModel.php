@@ -1,10 +1,19 @@
 <?php
 class AuthModel extends CI_Model{
-    protected $table = "admin";
-    function getPassword($email) {
+    function getPasswordAdmin($email) {
         $this->db->select('password');
         $this->db->where('email', $email);
-        $query = $this->db->get($this->table);
+        $query = $this->db->get("admin");
+        if ($query->row()) {
+            return $query->row()->password;
+        } else {
+            return false;
+        }
+    }
+    function getPasswordUser($email) {
+        $this->db->select('password');
+        $this->db->where('email', $email);
+        $query = $this->db->get("user");
         if ($query->row()) {
             return $query->row()->password;
         } else {

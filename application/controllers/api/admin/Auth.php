@@ -30,7 +30,7 @@ class Auth extends REST_Controller
     {
         $password = $this->input->post('password');
         $email = $this->input->post('email');
-        if (hash('sha256', $password) == $this->AuthModel->getPassword($email)) {
+        if (hash('sha256', $password) == $this->AuthModel->getPasswordAdmin($email)) {
             $data = array(
                 "email" => $email,
                 "role" => "admin"

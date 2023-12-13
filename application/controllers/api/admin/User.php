@@ -22,18 +22,55 @@ class User extends REST_Controller
         $this->load->library('form_validation');
         $this->load->library('jwt');
     }
-    public function options_get() {
+
+    public function options_get()
+    {
         header("Access-Control-Allow-Origin: *");
         header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
         header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
         exit();
     }
 
-    function mengakaliFormValidationYangHanyaMendeteksiPostRequest(){
+    function authorization()
+    {
+        if (isset($this->input->request_headers()['Authorization'])) {
+            if ($this->jwt->decodeAdmin($this->input->request_headers()['Authorization']) == false) {
+                return false;
+            } else {
+                return true;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    function mengakaliFormValidationYangHanyaMendeteksiPostRequest()
+    {
         $_SERVER['REQUEST_METHOD'] = 'POST';
         $putData = $this->input->input_stream();
         $_POST = $putData;
     }
+
+    function checkUserExistOnPeminjam($id)
+    {
+        if (!($this->UserModel->checkUserExistOnPeminjam($id))) {
+            return true;
+        } else {
+            $this->form_validation->set_message('checkUserExistOnPeminjam', 'The user still borrow the book');
+            return false;
+        }
+    }
+
+    public function ifExist($id)
+    {
+        if ($this->UserModel->ifExist($id)) {
+            return true;
+        } else {
+            $this->form_validation->set_message('ifExist', 'The ID field not found.');
+            return false;
+        }
+    }
+
     function validate()
     {
         $this->form_validation->set_rules('username', 'Username', 'required|trim|is_unique[user.username]');
@@ -42,27 +79,10 @@ class User extends REST_Controller
         $this->form_validation->set_rules('nomor_telepon', 'Phone Number', 'required|trim|numeric|is_unique[user.nomor_telepon]|max_length[16]');
         $this->form_validation->set_rules('alamat', 'Adress', 'required|trim');
     }
-    function checkUserExistOnPeminjam($id){
-        if(!($this->UserModel->checkUserExistOnPeminjam($id))){
-            return true;
-        } else {
-            $this->form_validation->set_message('checkUserExistOnPeminjam', 'The user still borrow the book');
-            return false;
-        }
-    }
+
     function index_get()
     {
-        if (isset($this->input->request_headers()['Authorization'])){
-            if ($this->jwt->decode($this->input->request_headers()['Authorization'])==false) {
-                return $this->response(
-                    array(
-                        'kode' => '401',
-                        'pesan' => 'signature tidak sesuai',
-                        'data' => []
-                    ), 401
-                );
-            }
-        } else{
+        if (!$this->authorization()) {
             return $this->response(
                 array(
                     'kode' => '401',
@@ -79,19 +99,10 @@ class User extends REST_Controller
         }
         $this->response($data, 200);
     }
+
     function index_post()
     {
-        if (isset($this->input->request_headers()['Authorization'])){
-            if ($this->jwt->decode($this->input->request_headers()['Authorization'])==false) {
-                return $this->response(
-                    array(
-                        'kode' => '401',
-                        'pesan' => 'signature tidak sesuai',
-                        'data' => []
-                    ), 401
-                );
-            }
-        } else{
+        if (!$this->authorization()) {
             return $this->response(
                 array(
                     'kode' => '401',
@@ -107,7 +118,7 @@ class User extends REST_Controller
                 'status' => 502,
                 'message' => $error_array
             );
-            return $this->response($response,502);
+            return $this->response($response, 502);
         }
         $data = array(
             'username' => $this->post('username'),
@@ -116,36 +127,18 @@ class User extends REST_Controller
             'nomor_telepon' => $this->post('nomor_telepon'),
             'alamat' => $this->post('alamat')
         );
-        if($this->UserModel->insert($data)){
+        if ($this->UserModel->insert($data)) {
             $response = array(
                 'status' => 201,
                 'message' => 'Success'
             );
-            return $this->response($response,201);
+            return $this->response($response, 201);
         }
     }
-    public function ifExist($id)
-    {
-        if ($this->UserModel->ifExist($id)) {
-            return true;
-        } else {
-            $this->form_validation->set_message('ifExist', 'The ID field not found.');
-            return false;
-        }
-    }
+
     function index_put()
     {
-        if (isset($this->input->request_headers()['Authorization'])){
-            if ($this->jwt->decode($this->input->request_headers()['Authorization'])==false) {
-                return $this->response(
-                    array(
-                        'kode' => '401',
-                        'pesan' => 'signature tidak sesuai',
-                        'data' => []
-                    ), 401
-                );
-            }
-        } else{
+        if (!$this->authorization()) {
             return $this->response(
                 array(
                     'kode' => '401',
@@ -163,7 +156,7 @@ class User extends REST_Controller
                 'status' => 502,
                 'message' => $error_array
             );
-            return $this->response($response,502);
+            return $this->response($response, 502);
         }
         $data = array(
             'username' => $this->put('username'),
@@ -172,27 +165,18 @@ class User extends REST_Controller
             'nomor_telepon' => $this->put('nomor_telepon'),
             'alamat' => $this->put('alamat')
         );
-        if($this->UserModel->update($this->put('id'),$data)){
+        if ($this->UserModel->update($this->put('id'), $data)) {
             $response = array(
                 'status' => 201,
                 'message' => 'Success'
             );
-            return $this->response($response,201);
+            return $this->response($response, 201);
         }
     }
+
     function index_delete()
     {
-        if (isset($this->input->request_headers()['Authorization'])){
-            if ($this->jwt->decode($this->input->request_headers()['Authorization'])==false) {
-                return $this->response(
-                    array(
-                        'kode' => '401',
-                        'pesan' => 'signature tidak sesuai',
-                        'data' => []
-                    ), 401
-                );
-            }
-        } else{
+        if (!$this->authorization()) {
             return $this->response(
                 array(
                     'kode' => '401',
@@ -209,14 +193,14 @@ class User extends REST_Controller
                 'status' => 502,
                 'message' => $error_array
             );
-            return $this->response($response,502);
+            return $this->response($response, 502);
         }
-        if($this->UserModel->delete($this->delete('id'))){
+        if ($this->UserModel->delete($this->delete('id'))) {
             $response = array(
                 'status' => 201,
                 'message' => 'Success'
             );
-            return $this->response($response,201);
+            return $this->response($response, 201);
         }
     }
 
