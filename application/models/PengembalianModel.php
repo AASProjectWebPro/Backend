@@ -28,6 +28,15 @@ class PengembalianModel extends CI_Model
         $query = $this->db->get($this->table);
         return $query->result_array();
     }
+    function readUser($id = '')
+    {
+        if ($id) {
+            $this->db->where("id_user", $id);
+        }
+        $this->db->order_by('id', 'DESC');
+        $query = $this->db->get($this->table);
+        return $query->result_array();
+    }
     function insert($data)
     {
         $this->db->insert($this->table, $data);

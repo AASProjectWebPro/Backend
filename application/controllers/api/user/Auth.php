@@ -19,6 +19,7 @@ class Auth extends REST_Controller
         $this->load->library('jwt');
         $this->load->database();
         $this->load->model('AuthModel');
+        $this->load->model('UserModel');
     }
     public function options_get() {
         header("Access-Control-Allow-Origin: *");
@@ -33,6 +34,7 @@ class Auth extends REST_Controller
         if (hash('sha256', $password) == $this->AuthModel->getPasswordUser($email)) {
             $data = array(
                 "email" => $email,
+                "id" => $this->UserModel->get_id_by_email($email),
                 "role" => "user"
             );
             $token = $this->jwt->encode($data);
