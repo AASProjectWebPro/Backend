@@ -60,4 +60,33 @@ class Jwt
             return false;
         }
     }
+    public function decodeUser($param) {
+        $key = $this->CI->config->item('jwt_key');
+        $algorithm = $this->CI->config->item('jwt_algoritma');
+        if(isset($param)) {
+            $authHeader = $param;
+            $arr = explode("Bearer ", $authHeader);
+            if (count($arr) > 1) {
+                $token = $arr[1];
+                if ($token) {
+                    try {
+                        $decoded = JWTLib::decode($token, new Key($key, $algorithm));
+                        $decodedData=json_decode(base64_decode(explode('.', $token)[1]))->data->role;
+                        if ($decodedData!=="user"){ //khusus jwt untuk user
+                            return false;
+                        }
+                        if ($decoded) {
+                            return true;
+                        }
+                    } catch (\Exception $e) {
+                        return false;
+                    }
+                }
+            }else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
 }

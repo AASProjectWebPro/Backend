@@ -20,8 +20,30 @@ class HistoryPeminjaman extends REST_Controller
         $this->load->library('form_validation');
         $this->load->library('jwt');
     }
+    function authorization()
+    {
+        if (isset($this->input->request_headers()['Authorization'])) {
+            if ($this->jwt->decodeUser($this->input->request_headers()['Authorization']) == false) {
+                return false;
+            } else {
+                return true;
+            }
+        } else {
+            return false;
+        }
+    }
     function index_get()
     {
+        if (!$this->authorization()) {
+            return $this->response(
+                array(
+                    'kode' => '401',
+                    'pesan' => 'Unauthorized',
+                    'data' => []
+                ), 401
+            );
+        }
+
         $jwt=explode("Bearer ",$this->input->request_headers()['Authorization']);
         $id=json_decode(base64_decode(explode('.', $jwt[1])[1]))->data->id;
         $data = $this->PengembalianModel->readUser($id);
