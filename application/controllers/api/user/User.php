@@ -12,7 +12,20 @@ class User extends REST_Controller
         parent::__construct();
         $this->load->database();
         $this->load->model('UserModel');
+        $this->load->library('jwt');
         $this->load->library('form_validation');
+    }
+    function authorization()
+    {
+        if (isset($this->input->request_headers()['Authorization'])) {
+            if ($this->jwt->decodeUser($this->input->request_headers()['Authorization']) == false) {
+                return false;
+            } else {
+                return true;
+            }
+        } else {
+            return false;
+        }
     }
     function validate()
     {
@@ -22,8 +35,20 @@ class User extends REST_Controller
         $this->form_validation->set_rules('nomor_telepon', 'Phone Number', 'required|trim|numeric|is_unique[user.nomor_telepon]|max_length[16]');
         $this->form_validation->set_rules('alamat', 'Adress', 'required|trim');
     }
-    function index_get(){
-        //user by id jwt payload
+    function name_get(){
+        if (!$this->authorization()) {
+            return $this->response(
+                array(
+                    'kode' => '401',
+                    'pesan' => 'Unauthorized',
+                    'data' => []
+                ), 401
+            );
+        }
+        $jwt=explode("Bearer ",$this->input->request_headers()['Authorization']);
+        $id=json_decode(base64_decode(explode('.', $jwt[1])[1]))->data->id;
+        $data = $this->UserModel->get_name_by_id($id);
+        $this->response(array('username'=>$data), 200);
     }
     function index_put(){
         //user by id jwt payload

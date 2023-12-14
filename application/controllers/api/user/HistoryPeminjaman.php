@@ -43,7 +43,6 @@ class HistoryPeminjaman extends REST_Controller
                 ), 401
             );
         }
-
         $jwt=explode("Bearer ",$this->input->request_headers()['Authorization']);
         $id=json_decode(base64_decode(explode('.', $jwt[1])[1]))->data->id;
         $data = $this->PengembalianModel->readUser($id);
