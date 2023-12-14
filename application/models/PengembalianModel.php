@@ -2,6 +2,15 @@
 class PengembalianModel extends CI_Model
 {
     protected $table = "history_pengembalian";
+    function fetch_all()
+    {
+        $this->db->select('history_pengembalian.id, user.username,user.email, history_pengembalian.isbn_buku,history_pengembalian.judul, history_pengembalian.tanggal_peminjaman,history_pengembalian.tanggal_pengembalian');
+        $this->db->from('history_pengembalian');
+        $this->db->join('user', 'history_pengembalian.id_user = user.id');
+
+        $query = $this->db->get();
+        return $query->result_array();
+    }
     function checkHistory($id){
         $this->db->where('id', $id);
         $query = $this->db->get($this->table);

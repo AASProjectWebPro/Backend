@@ -209,13 +209,10 @@ class TransaksiPeminjaman extends REST_Controller
         $dataTmp = $this->M_Peminjaman->fetch_single_data($this->delete('id')); //select * from peminjaman where id untuk ditambahkan ke histori
         $isbn = $this->M_Buku->get_isbn_by_id($dataTmp[0]['id_buku']);
         $judul = $this->M_Buku->get_judul_by_id($dataTmp[0]['id_buku']);
-        $username = $this->UserModel->get_username_by_id($dataTmp[0]['id_user']);
-        $email = $this->UserModel->get_email_by_id($dataTmp[0]['id_user']);
         $data = array(
+            'id_user' => $dataTmp[0]['id_user'],
             'isbn_buku' => $isbn,
             'judul' => $judul,
-            'email' => $email,
-            'username' => $username,
             'tanggal_peminjaman' => $dataTmp[0]['tanggal_peminjaman'],
             'tanggal_pengembalian' => date('Y-m-d')
         );

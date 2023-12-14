@@ -84,7 +84,7 @@ class HistoryPeminjaman extends REST_Controller
                 $this->response(['message' => 'Data not found'], 404);
             }
         } else {
-            $dataAll = $this->PengembalianModel->read();
+            $dataAll = $this->PengembalianModel->fetch_all();
             $this->response($dataAll, 200);
         }
     }
