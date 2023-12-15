@@ -4,6 +4,16 @@
 class UserModel extends CI_Model
 {
     protected $table = "user";
+    function getPasswordUser($id) {
+        $this->db->select('password');
+        $this->db->where('id', $id);
+        $query = $this->db->get("user");
+        if ($query->row()) {
+            return $query->row()->password;
+        } else {
+            return false;
+        }
+    }
     function ifExist($id){
         $this->db->where('id', $id);
         $query = $this->db->get($this->table);
