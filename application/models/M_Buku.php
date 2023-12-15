@@ -1,11 +1,23 @@
 <?php class M_Buku extends CI_Model
 {
+    function __construct()
+    {
+        $this->load->helper('url');
+    }
+    function ifExist($id){
+        $this->db->where('id', $id);
+        $query = $this->db->get('buku');
+        if ($query->num_rows() > 0) {
+            return true;
+        }
+        return false;
+    }
     function fetch_all()
     {
         $this->db->order_by('id', 'ASC');
         $query = $this->db->get('buku');
         $result = $query->result_array();
-        $this->load->helper('url');
+
         foreach ($result as &$row) {
             $row['gambar'] = base_url().'/upload/' . $row['gambar'];
         }
@@ -50,7 +62,9 @@
     {
         $this->db->where('id',$id);
         $query = $this->db->get('buku');
-        return $query->row();
+        $result = $query->row_array();
+        $result['gambar'] = base_url().'/upload/' . $result['gambar'];
+        return $result;
     }
     function check_data($id)
     {
