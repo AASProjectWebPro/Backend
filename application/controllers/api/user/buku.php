@@ -20,6 +20,13 @@ class buku extends REST_Controller
         $this->load->library('form_validation');
         $this->load->library('jwt');
     }
+    public function options_get()
+    {
+        header("Access-Control-Allow-Origin: *");
+        header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
+        header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+        exit();
+    }
     function authorization()
     {
         if (isset($this->input->request_headers()['Authorization'])) {

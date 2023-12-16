@@ -77,7 +77,7 @@ class TransaksiPeminjaman extends REST_Controller
 
     function get_stock_by_id($id)
     {
-        if ($this->M_Buku->get_stock_by_id($id) >= 0) {
+        if ($this->M_Buku->get_stock_by_id($id) > 0) {
             return true;
         } else {
             $this->form_validation->set_message('get_stock_by_id', 'The buku is out of stock.');

@@ -25,6 +25,13 @@
             $this->load->library('form_validation');
             $this->load->library('jwt');
         }
+        public function options_get()
+        {
+            header("Access-Control-Allow-Origin: *");
+            header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
+            header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+            exit();
+        }
         function authorization()
         {
             if (isset($this->input->request_headers()['Authorization'])) {
@@ -39,7 +46,7 @@
         }
         function get_stock_by_id($id)
         {
-            if ($this->M_Buku->get_stock_by_id($id) >= 0) {
+            if ($this->M_Buku->get_stock_by_id($id) > 0) {
                 return true;
             } else {
                 $this->form_validation->set_message('get_stock_by_id', 'The buku is out of stock.');
@@ -67,6 +74,7 @@
             }
             $_SERVER['REQUEST_METHOD'] = 'POST';
             $jwt=explode("Bearer ",$this->input->request_headers()['Authorization']);
+            echo $_POST['id_buku'];
             $_POST['id_user']=json_decode(base64_decode(explode('.', $jwt[1])[1]))->data->id;
             $this->form_validation->set_rules('id_user', 'ID User', 'numeric|is_unique[transaksi_peminjaman.id_user]');
             if ($this->form_validation->run() === false) {

@@ -12,7 +12,7 @@ class User extends REST_Controller
         parent::__construct();
         header('Access-Control-Allow-Origin:*');
         header("Access-Control-Allow-Headers:X-API-KEY,Origin,X-Requested-With,Content-Type,Accept,Access-Control-Request-Method,Authorization");
-        header("Access-Control-Allow-Methods:GET,POST,OPTIONS,PUT,DELETE");
+        header("Access-Control-Allow-Methods:GET,POST,OPTIONS,PUT,DELETE,PATCH");
         $method = $_SERVER['REQUEST_METHOD'];
         if ($method == "OPTIONS") {
             die();
@@ -21,6 +21,13 @@ class User extends REST_Controller
         $this->load->model('UserModel');
         $this->load->library('jwt');
         $this->load->library('form_validation');
+    }
+    public function options_get()
+    {
+        header("Access-Control-Allow-Origin: *");
+        header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
+        header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+        exit();
     }
     function authorization()
     {
@@ -79,9 +86,6 @@ class User extends REST_Controller
         $id=json_decode(base64_decode(explode('.', $jwt[1])[1]))->data->id;
         $data = $this->UserModel->get_name_by_id($id);
         $this->response(array('username'=>$data), 200);
-    }
-    function index_put(){
-        //user by id jwt payload
     }
     function register_post(){
         $this->form_validation->set_rules('password', 'Password', 'required|min_length[6]');
