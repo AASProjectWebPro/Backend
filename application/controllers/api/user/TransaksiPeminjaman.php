@@ -74,7 +74,6 @@
             }
             $_SERVER['REQUEST_METHOD'] = 'POST';
             $jwt=explode("Bearer ",$this->input->request_headers()['Authorization']);
-            echo $_POST['id_buku'];
             $_POST['id_user']=json_decode(base64_decode(explode('.', $jwt[1])[1]))->data->id;
             $this->form_validation->set_rules('id_user', 'ID User', 'numeric|is_unique[transaksi_peminjaman.id_user]');
             if ($this->form_validation->run() === false) {
@@ -84,6 +83,8 @@
                     'message' => $error_array
                 );
                 return $this->response($response, 502);
+            }else{
+                return $this->response('', 200);
             }
 
         }
