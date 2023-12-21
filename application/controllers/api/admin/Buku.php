@@ -37,9 +37,31 @@ class Buku extends REST_Controller
         $_POST = $putData;
     }
 
+    function validasiUnikBuatanHilmiUpdateBuku()
+    {
+        $query1= $this->db
+            ->select('id')
+            ->from('buku')
+            ->where('id',$_POST['id'])
+            ->where('isbn',$_POST['isbn'])
+            ->count_all_results();
+        $query2= $this->db
+            ->select('id')
+            ->from('buku')
+            ->where('isbn',$_POST['isbn'])
+            ->count_all_results();
+        if ($query1 > 0 and $query2 > 0 or $query2 <= 0) {
+            return true;
+        }
+        else {
+            $this->form_validation->set_message('validasiUnikBuatanHilmiUpdateBuku', 'ISBN tersebut sudah dipakai silahkan ganti yang lain.');
+            return false;
+        }
+    }
+
     function validate()
     {
-        $this->form_validation->set_rules('isbn', 'Isbn', 'required|trim|is_unique[buku.isbn]');
+
         $this->form_validation->set_rules('judul', 'Judul', 'required|trim|min_length[5]');
         $this->form_validation->set_rules('pengarang', 'Pengarang', 'required|trim|min_length[5]');
         $this->form_validation->set_rules('penerbit', 'Penerbit', 'required|trim|min_length[5]');
@@ -115,6 +137,7 @@ class Buku extends REST_Controller
                 ), 401
             );
         }
+        $this->form_validation->set_rules('isbn', 'Isbn', 'required|trim|is_unique[buku.isbn]');
         $this->validate();
 
         //validasi file:v
@@ -190,9 +213,9 @@ class Buku extends REST_Controller
             $this->form_validation->set_rules('file_size', 'File Extension', 'callback_checkFileSize');
             $_POST['file_extension'] = pathinfo($_POST['file_name'], PATHINFO_EXTENSION);
             $this->form_validation->set_rules('file_extension', 'File Extension', 'callback_checkFileExtension');
-        } else {
-            $this->form_validation->set_rules('file', 'File', 'required');
         }
+
+        $this->form_validation->set_rules('isbn', 'Isbn', 'required|trim|callback_validasiUnikBuatanHilmiUpdateBuku');
         $this->validate();
         $this->form_validation->set_rules('id', 'ID', 'required|callback_ifExist');
         if ($this->form_validation->run() === false) {
@@ -205,9 +228,11 @@ class Buku extends REST_Controller
         }
 
         //proses simpan file versi bs64
-        $data = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $_POST['file']));
-        $filename = time() . '_' . uniqid() . "." . pathinfo($_POST['file_name'], PATHINFO_EXTENSION);
-        file_put_contents(FCPATH . '/upload/' . $filename, $data);
+        if (isset($_POST["file"])) {
+            $data = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $_POST['file']));
+            $filename = time() . '_' . uniqid() . "." . pathinfo($_POST['file_name'], PATHINFO_EXTENSION);
+            file_put_contents(FCPATH . '/upload/' . $filename, $data);
+        }
 
         $data = array(
             'isbn' => $this->put('isbn'),
@@ -218,8 +243,10 @@ class Buku extends REST_Controller
             'jenis' => $this->put('jenis'),
             'deskripsi' => $this->put('deskripsi'),
             'stock' => $this->put('stock'),
-            'gambar' => $filename
         );
+        if (isset($_POST["file"])){
+            $data['gambar']=$filename;
+        }
 
         if ($this->M_Buku->update_data($this->put('id'), $data)) {
             $response = array(

@@ -30,6 +30,69 @@ class User extends REST_Controller
         header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
         exit();
     }
+    function validasiUnikBuatanHilmiUpdateUsername()
+    {
+        $query1= $this->db
+            ->select('id')
+            ->from('user')
+            ->where('id',$_POST['id'])
+            ->where('username',$_POST['username'])
+            ->count_all_results();
+        $query2= $this->db
+            ->select('id')
+            ->from('user')
+            ->where('username',$_POST['username'])
+            ->count_all_results();
+        if ($query1 > 0 and $query2 > 0 or $query2 <= 0) {
+            return true;
+        }
+        else {
+            $this->form_validation->set_message('validasiUnikBuatanHilmiUpdateUsername', 'Username tersebut sudah dipakai silahkan ganti yang lain.');
+            return false;
+        }
+    }
+    function validasiUnikBuatanHilmiUpdateEmail()
+    {
+        $query1= $this->db
+            ->select('id')
+            ->from('user')
+            ->where('id',$_POST['id'])
+            ->where('email',$_POST['email'])
+            ->count_all_results();
+        $query2= $this->db
+            ->select('id')
+            ->from('user')
+            ->where('email',$_POST['email'])
+            ->count_all_results();
+        if ($query1 > 0 and $query2 > 0 or $query2 <= 0) {
+            return true;
+        }
+        else {
+            $this->form_validation->set_message('validasiUnikBuatanHilmiUpdateEmail', 'Email tersebut sudah dipakai silahkan ganti yang lain.');
+            return false;
+        }
+    }
+    function validasiUnikBuatanHilmiUpdateNomor()
+    {
+        $query1= $this->db
+            ->select('id')
+            ->from('user')
+            ->where('id',$_POST['id'])
+            ->where('nomor_telepon',$_POST['nomor_telepon'])
+            ->count_all_results();
+        $query2= $this->db
+            ->select('id')
+            ->from('user')
+            ->where('nomor_telepon',$_POST['nomor_telepon'])
+            ->count_all_results();
+        if ($query1 > 0 and $query2 > 0 or $query2 <= 0) {
+            return true;
+        }
+        else {
+            $this->form_validation->set_message('validasiUnikBuatanHilmiUpdateNomor', 'Nomor Telepon tersebut sudah dipakai silahkan ganti yang lain.');
+            return false;
+        }
+    }
 
     function authorization()
     {
@@ -149,7 +212,15 @@ class User extends REST_Controller
         }
         $this->mengakaliFormValidationYangHanyaMendeteksiPostRequest();
         $this->form_validation->set_rules('id', 'ID', 'required|callback_ifExist');
-        $this->validate();
+        $this->form_validation->set_rules('username', 'Username', 'required|trim|callback_validasiUnikBuatanHilmiUpdateUsername');
+        $this->form_validation->set_rules('email', 'Email', 'required|trim|valid_email|callback_validasiUnikBuatanHilmiUpdateEmail');
+        if(isset($_POST['password'])){
+            if($_POST['password']!=''){
+                $this->form_validation->set_rules('password', 'Password', 'min_length[6]');
+            }
+        }
+        $this->form_validation->set_rules('nomor_telepon', 'Phone Number', 'required|trim|numeric|max_length[16]|callback_validasiUnikBuatanHilmiUpdateNomor');
+        $this->form_validation->set_rules('alamat', 'Adress', 'required|trim');
         if ($this->form_validation->run() === FALSE) {
             $error_array = $this->form_validation->error_array();
             $response = array(
@@ -161,10 +232,15 @@ class User extends REST_Controller
         $data = array(
             'username' => $this->put('username'),
             'email' => $this->put('email'),
-            'password' => hash('sha256', $this->put('password')),
+
             'nomor_telepon' => $this->put('nomor_telepon'),
             'alamat' => $this->put('alamat')
         );
+        if(isset($_POST['password'])){
+            if($_POST['password']!=''){
+                $data['password']= hash('sha256', $this->put('password'));
+            }
+        }
         if ($this->UserModel->update($this->put('id'), $data)) {
             $response = array(
                 'status' => 201,
