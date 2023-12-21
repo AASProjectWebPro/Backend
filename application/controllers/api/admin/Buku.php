@@ -163,7 +163,7 @@ class Buku extends REST_Controller
         move_uploaded_file($_FILES["file"]["tmp_name"], FCPATH . '/upload/' . $filename);
 
         $data = array(
-            'isbn' => $this->post('isbn'),
+            'isbn' => trim($this->post('isbn')),
             'judul' => $this->post('judul'),
             'pengarang' => $this->post('pengarang'),
             'penerbit' => $this->post('penerbit'),
@@ -235,7 +235,7 @@ class Buku extends REST_Controller
         }
 
         $data = array(
-            'isbn' => $this->put('isbn'),
+            'isbn' => trim($this->put('isbn')),
             'judul' => $this->put('judul'),
             'pengarang' => $this->put('pengarang'),
             'penerbit' => $this->put('penerbit'),

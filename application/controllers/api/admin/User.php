@@ -184,7 +184,7 @@ class User extends REST_Controller
             return $this->response($response, 502);
         }
         $data = array(
-            'username' => $this->post('username'),
+            'username' => trim($this->post('username')),
             'email' => $this->post('email'),
             'password' => hash('sha256', $this->post('password')),
             'nomor_telepon' => $this->post('nomor_telepon'),
@@ -230,7 +230,7 @@ class User extends REST_Controller
             return $this->response($response, 502);
         }
         $data = array(
-            'username' => $this->put('username'),
+            'username' => trim($this->put('username')),
             'email' => $this->put('email'),
 
             'nomor_telepon' => $this->put('nomor_telepon'),
