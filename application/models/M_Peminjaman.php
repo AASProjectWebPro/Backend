@@ -33,6 +33,16 @@
                 return false;
             }
         }
+        function getStatusPeminjamUser($id) {
+            $this->db->select('status');
+            $this->db->where('id_user', $id);
+            $query = $this->db->get("transaksi_peminjaman");
+            if ($query->row()) {
+                return $query->row()->status;
+            } else {
+                return false;
+            }
+        }
         function checkISBN($isbn)
         {
             $this->db->where('isbn', $isbn);

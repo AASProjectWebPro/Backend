@@ -25,6 +25,7 @@
             $this->load->library('form_validation');
             $this->load->library('jwt');
         }
+
         public function options_get()
         {
             header("Access-Control-Allow-Origin: *");
@@ -32,6 +33,7 @@
             header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
             exit();
         }
+
         function authorization()
         {
             if (isset($this->input->request_headers()['Authorization'])) {
@@ -44,6 +46,7 @@
                 return false;
             }
         }
+
         function get_stock_by_id($id)
         {
             if ($this->M_Buku->get_stock_by_id($id) > 0) {
@@ -53,6 +56,7 @@
                 return false;
             }
         }
+
         public function ifExist($id)
         {
             if ($this->M_Buku->ifExist($id)) {
@@ -62,7 +66,10 @@
                 return false;
             }
         }
-        function index_get(){
+
+
+        function index_get()
+        {
             if (!$this->authorization()) {
                 return $this->response(
                     array(
@@ -73,22 +80,24 @@
                 );
             }
             $_SERVER['REQUEST_METHOD'] = 'POST';
-            $jwt=explode("Bearer ",$this->input->request_headers()['Authorization']);
-            $_POST['id_user']=json_decode(base64_decode(explode('.', $jwt[1])[1]))->data->id;
-            $this->form_validation->set_rules('id_user', 'ID User', 'numeric|is_unique[transaksi_peminjaman.id_user]');
+            $jwt = explode("Bearer ", $this->input->request_headers()['Authorization']);
+            $_POST['id_user'] = json_decode(base64_decode(explode('.', $jwt[1])[1]))->data->id;
+            $this->form_validation->set_rules('id_user', 'ID User', 'numeric');
             if ($this->form_validation->run() === false) {
                 $error_array = $this->form_validation->error_array();
                 $response = array(
                     'status' => 502,
-                    'message' => $error_array
+                    'message' => 'ID tidak valid.'
                 );
                 return $this->response($response, 502);
-            }else{
-                return $this->response('', 200);
             }
-
+            $data = array(
+                'status'=>$this->M_Peminjaman->getStatusPeminjamUser($_POST['id_user'])
+            );
+            return $this->response($data, 200);
         }
-        function index_post(){
+        function index_post()
+        {
             if (!$this->authorization()) {
                 return $this->response(
                     array(
@@ -98,8 +107,8 @@
                     ), 401
                 );
             }
-            $jwt=explode("Bearer ",$this->input->request_headers()['Authorization']);
-            $_POST['id_user']=json_decode(base64_decode(explode('.', $jwt[1])[1]))->data->id;
+            $jwt = explode("Bearer ", $this->input->request_headers()['Authorization']);
+            $_POST['id_user'] = json_decode(base64_decode(explode('.', $jwt[1])[1]))->data->id;
             $this->form_validation->set_rules('id_user', 'ID User', 'numeric|is_unique[transaksi_peminjaman.id_user]');
             $this->form_validation->set_rules('id_buku', 'ID Buku', 'numeric|callback_ifExist|callback_get_stock_by_id');
             if ($this->form_validation->run() === false) {
@@ -113,7 +122,7 @@
             $data = array(
                 'id_user' => $_POST['id_user'],
                 'id_buku' => $_POST['id_buku'],
-                'status'=>'pending',
+                'status' => 'pending',
                 'tanggal_peminjaman' => date('Y-m-d')
             );
             if ($this->M_Peminjaman->insert_api($data)) {
@@ -128,3 +137,4 @@
             }
         }
     }
+

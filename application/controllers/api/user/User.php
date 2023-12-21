@@ -41,6 +41,69 @@ class User extends REST_Controller
             return false;
         }
     }
+    function validasiUnikBuatanHilmiUpdateUsername()
+    {
+        $query1= $this->db
+            ->select('id')
+            ->from('user')
+            ->where('id',$_POST['id'])
+            ->where('username',$_POST['username'])
+            ->count_all_results();
+        $query2= $this->db
+            ->select('id')
+            ->from('user')
+            ->where('username',$_POST['username'])
+            ->count_all_results();
+        if ($query1 > 0 and $query2 > 0 or $query2 <= 0) {
+            return true;
+        }
+        else {
+            $this->form_validation->set_message('validasiUnikBuatanHilmiUpdateUsername', 'Username tersebut sudah dipakai silahkan ganti yang lain.');
+            return false;
+        }
+    }
+    function validasiUnikBuatanHilmiUpdateEmail()
+    {
+        $query1= $this->db
+            ->select('id')
+            ->from('user')
+            ->where('id',$_POST['id'])
+            ->where('email',$_POST['email'])
+            ->count_all_results();
+        $query2= $this->db
+            ->select('id')
+            ->from('user')
+            ->where('email',$_POST['email'])
+            ->count_all_results();
+        if ($query1 > 0 and $query2 > 0 or $query2 <= 0) {
+            return true;
+        }
+        else {
+            $this->form_validation->set_message('validasiUnikBuatanHilmiUpdateEmail', 'Email tersebut sudah dipakai silahkan ganti yang lain.');
+            return false;
+        }
+    }
+    function validasiUnikBuatanHilmiUpdateNomor()
+    {
+        $query1= $this->db
+            ->select('id')
+            ->from('user')
+            ->where('id',$_POST['id'])
+            ->where('nomor_telepon',$_POST['nomor_telepon'])
+            ->count_all_results();
+        $query2= $this->db
+            ->select('id')
+            ->from('user')
+            ->where('nomor_telepon',$_POST['nomor_telepon'])
+            ->count_all_results();
+        if ($query1 > 0 and $query2 > 0 or $query2 <= 0) {
+            return true;
+        }
+        else {
+            $this->form_validation->set_message('validasiUnikBuatanHilmiUpdateNomor', 'Nomor Telepon tersebut sudah dipakai silahkan ganti yang lain.');
+            return false;
+        }
+    }
     public function ifExist($id)
     {
         if ($this->UserModel->ifExist($id)) {
@@ -129,7 +192,10 @@ class User extends REST_Controller
         $jwt=explode("Bearer ",$this->input->request_headers()['Authorization']);
         $_POST['id']=json_decode(base64_decode(explode('.', $jwt[1])[1]))->data->id;
         $this->form_validation->set_rules('id', 'ID', 'required|callback_ifExist');
-        $this->validate();
+        $this->form_validation->set_rules('username', 'Username', 'required|trim|callback_validasiUnikBuatanHilmiUpdateUsername');
+        $this->form_validation->set_rules('email', 'Email', 'required|trim|valid_email|callback_validasiUnikBuatanHilmiUpdateEmail');
+        $this->form_validation->set_rules('nomor_telepon', 'Phone Number', 'required|trim|numeric|max_length[16]|callback_validasiUnikBuatanHilmiUpdateNomor');
+        $this->form_validation->set_rules('alamat', 'Adress', 'required|trim');
         if ($this->form_validation->run() === FALSE) {
             $error_array = $this->form_validation->error_array();
             $response = array(
