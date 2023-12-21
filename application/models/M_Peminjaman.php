@@ -3,7 +3,7 @@
     {
         function fetch_all()
         {
-            $this->db->select('transaksi_peminjaman.id, user.username,user.email, buku.isbn,buku.judul, transaksi_peminjaman.tanggal_peminjaman');
+            $this->db->select('transaksi_peminjaman.id,transaksi_peminjaman.status, user.username,user.email, buku.isbn,buku.judul, transaksi_peminjaman.tanggal_peminjaman');
             $this->db->from('transaksi_peminjaman');
             $this->db->join('user', 'transaksi_peminjaman.id_user = user.id');
             $this->db->join('buku', 'transaksi_peminjaman.id_buku = buku.id');
@@ -19,6 +19,16 @@
 
             if ($query->row()) {
                 return true;
+            } else {
+                return false;
+            }
+        }
+        function getStatusPeminjam($id) {
+            $this->db->select('status');
+            $this->db->where('id', $id);
+            $query = $this->db->get("transaksi_peminjaman");
+            if ($query->row()) {
+                return $query->row()->status;
             } else {
                 return false;
             }

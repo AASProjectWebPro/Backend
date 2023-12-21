@@ -186,6 +186,23 @@ class TransaksiPeminjaman extends REST_Controller
         }
     }
 
+    function validasiCustomBuatanHilmiUntukCekStatusPending(){
+       if($this->M_Peminjaman->getStatusPeminjam($_POST['id'])!='pending'){
+           return true;
+       }else{
+           $this->form_validation->set_message('validasiCustomBuatanHilmiUntukCekStatusPending', 'Status transaksi ini masih pending.');
+            return false;
+       }
+    }
+    function validasiCustomBuatanHilmiUntukCekStatusPeminjaman(){
+        if($this->M_Peminjaman->getStatusPeminjam($_POST['id'])!='peminjaman'){
+            return true;
+        }else{
+            $this->form_validation->set_message('validasiCustomBuatanHilmiUntukCekStatusPeminjaman', 'Status transaksi ini sudah masuk ke peminjaman.');
+            return false;
+        }
+    }
+
     function pengembalian_delete()
     {
         if (!$this->authorization()) {
@@ -198,7 +215,7 @@ class TransaksiPeminjaman extends REST_Controller
             );
         }
         $this->mengakaliFormValidationYangHanyaMendeteksiPostRequest();
-        $this->form_validation->set_rules('id', 'ID Transaksi', 'numeric|callback_check_id_transaksi');
+        $this->form_validation->set_rules('id', 'ID Transaksi', 'numeric|callback_check_id_transaksi|callback_validasiCustomBuatanHilmiUntukCekStatusPending');
         if ($this->form_validation->run() === FALSE) {
             $error_array = $this->form_validation->error_array();
             $response = array(
@@ -226,6 +243,76 @@ class TransaksiPeminjaman extends REST_Controller
             'status_code' => 200,
         );
         return $this->response($response, 200);
+    }
+
+    function batal_delete()
+    {
+        if (!$this->authorization()) {
+            return $this->response(
+                array(
+                    'kode' => '401',
+                    'pesan' => 'Unauthorized',
+                    'data' => []
+                ), 401
+            );
+        }
+        $this->mengakaliFormValidationYangHanyaMendeteksiPostRequest();
+        $data = array(
+            'id' => $this->delete('id')
+        );
+        $this->form_validation->set_rules('id', 'ID Transaksi', 'numeric|callback_check_id_transaksi|callback_validasiCustomBuatanHilmiUntukCekStatusPeminjaman');
+        if ($this->form_validation->run() === FALSE) {
+            $error_array = $this->form_validation->error_array();
+            $response = array(
+                'status' => 502,
+                'message' => $error_array
+            );
+            return $this->response($response, 502);
+        }
+        if ($this->M_Peminjaman->delete_data($data['id'])) {
+            $response = array(
+                'status' => 201,
+                'message' => 'Success'
+            );
+            return $this->response($response, 201);
+        }
+    }
+
+    function approve_patch()
+    {
+        if (!$this->authorization()) {
+            return $this->response(
+                array(
+                    'kode' => '401',
+                    'pesan' => 'Unauthorized',
+                    'data' => []
+                ), 401
+            );
+        }
+        $this->mengakaliFormValidationYangHanyaMendeteksiPostRequest();
+        $data = array(
+            'id' => $this->patch('id'),
+            'status' =>'peminjaman'
+        );
+        $this->form_validation->set_rules('id', 'ID Transaksi', 'numeric|callback_check_id_transaksi|callback_validasiCustomBuatanHilmiUntukCekStatusPeminjaman');
+        if ($this->form_validation->run() === FALSE) {
+            $error_array = $this->form_validation->error_array();
+            $response = array(
+                'status' => 502,
+                'message' => $error_array
+            );
+            return $this->response($response, 502);
+        }
+        $dataTmp = $this->M_Peminjaman->fetch_single_data($this->patch('id'));
+        $stockBukuSaatIni = $this->M_Buku->get_stock_by_id($dataTmp[0]['id_buku']);
+        $kurangiSatuStockBuku = $this->M_Buku->update_data($dataTmp[0]['id_buku'], array('stock' => $stockBukuSaatIni - 1));
+        if ($this->M_Peminjaman->update_data($data['id'],$data)) {
+            $response = array(
+                'status' => 201,
+                'message' => 'Success'
+            );
+            return $this->response($response, 201);
+        }
     }
 }
 

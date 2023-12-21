@@ -113,11 +113,13 @@
             $data = array(
                 'id_user' => $_POST['id_user'],
                 'id_buku' => $_POST['id_buku'],
+                'status'=>'pending',
                 'tanggal_peminjaman' => date('Y-m-d')
             );
             if ($this->M_Peminjaman->insert_api($data)) {
-                $stockBukuSaatIni = $this->M_Buku->get_stock_by_id($_POST['id_buku']);
-                $kurangiSatuStockBuku = $this->M_Buku->update_data($_POST['id_buku'], array('stock' => $stockBukuSaatIni - 1));
+//                $stockBukuSaatIni = $this->M_Buku->get_stock_by_id($_POST['id_buku']);
+//                $kurangiSatuStockBuku = $this->M_Buku->update_data($_POST['id_buku'], array('stock' => $stockBukuSaatIni - 1));
+                //ganti logic karena di challange pak resa user hanya bisa status pending
                 $response = array(
                     'status' => 201,
                     'message' => 'Success'
