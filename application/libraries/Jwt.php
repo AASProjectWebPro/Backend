@@ -31,6 +31,31 @@ class Jwt
         ];
         return JWTLib::encode($token, $key, $algortima);
     }
+    public function decodeForgot($param) {
+        $key = $this->CI->config->item('jwt_key');
+        $algorithm = $this->CI->config->item('jwt_algoritma');
+        if(isset($param)) {
+            $authHeader = $param;
+            $arr = explode("Bearer ", $authHeader);
+            if (count($arr) > 1) {
+                $token = $arr[1];
+                if ($token) {
+                    try {
+                        $decoded = JWTLib::decode($token, new Key($key, $algorithm));
+                        if ($decoded) {
+                            return true;
+                        }
+                    } catch (\Exception $e) {
+                        return false;
+                    }
+                }
+            }else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
     public function decodeAdmin($param) {
         $key = $this->CI->config->item('jwt_key');
         $algorithm = $this->CI->config->item('jwt_algoritma');

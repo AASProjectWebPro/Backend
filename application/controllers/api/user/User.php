@@ -113,6 +113,15 @@ class User extends REST_Controller
             return false;
         }
     }
+    public function ifExistForgot($id)
+    {
+        if ($this->UserModel->ifExist($id)) {
+            return true;
+        } else {
+            $this->form_validation->set_message('ifExistForgot', 'The Email field not found.');
+            return false;
+        }
+    }
     function validate()
     {
         $this->form_validation->set_rules('username', 'Username', 'required|trim|is_unique[user.username]');
@@ -275,5 +284,164 @@ class User extends REST_Controller
             );
             return $this->response($response, 201);
         }
+    }
+    public function forgot_post(){
+        $email = $this->input->post('email');
+        $_POST['id']=$this->UserModel->get_id_by_email($email);
+        $this->form_validation->set_rules('id', 'email', 'required|callback_ifExistForgot');
+        if ($this->form_validation->run() === FALSE) {
+            $error_array = $this->form_validation->error_array();
+            $response = array(
+                'status' => 502,
+                'message' => $error_array
+            );
+            return $this->response($response, 502);
+        }
+        $data = array(
+            "email" => $email,
+            "id" => $_POST['id']
+        );
+        $token = $this->jwt->encode($data);
+        $this->load->library('email');
+        $config = Array(
+            'protocol' => 'smtp',
+            'smtp_host' => 'sandbox.smtp.mailtrap.io',
+            'smtp_port' => 2525,
+            'smtp_user' => 'eb042361a0cb09',
+            'smtp_pass' => '41346920e56aaf',
+            'crlf' => "\r\n",
+            'newline' => "\r\n"
+        );
+        $potongDuluGaSih = explode('.', $token);
+        $headerPayload = $potongDuluGaSih[0].'.'.$potongDuluGaSih[1];
+        $signature = $potongDuluGaSih[2];
+        $this->email->initialize($config)
+        ->from('your@example.com', 'Your Name')
+        ->to('someone@example.com')
+        ->cc('another@another-example.com')
+        ->bcc('them@their-example.com')
+        ->set_mailtype("html")
+        ->subject('Email Test')
+        ->message('
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Password Reset Request - LibraLyra</title>
+                <style>
+                    body {
+                        font-family: "Poppins", sans-serif;
+                        margin: 0;
+                        padding: 0;
+                        background-color: #ef823f;
+            
+                    }
+                    .container {
+                        max-width: 600px;
+                        margin: 20px auto;
+                        padding: 20px;
+                        background-color: #ffffff;
+                        border-radius: 10px;
+                        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                    }
+                    h1 {
+                        color: #ef823f;
+                    }
+                    p {
+                        margin-bottom: 20px;
+                    }
+                    a {
+                        color: #ef823f;
+                        text-decoration: none;
+                        font-weight: bold;
+                    }
+                    .button {
+                        display: inline-block;
+                        padding: 10px 20px;
+                        background-color: #ef823f;
+                        color: #ffffff;
+                        text-decoration: none;
+                        border-radius: 5px;
+                    }
+                </style>
+            </head>
+            <body>
+            <div class="container">
+                <h1>Password Reset Request</h1>
+                <p>We received a request to reset your password for your LibraLyra account. If you did not make this request, you can safely ignore this email.</p>
+                <p>To reset your password, click the button below:</p>
+                <p>
+                    <a class="button" href="http://localhost/aaSProjectWebpro/Frontend-User/forgotChange.html?token='.$signature.'">Reset Password</a>
+                </p>
+                <p>
+                    If the button above doesnt work, you can also copy and paste the following link into your web browser:
+                    <br>
+                    <a href="http://localhost/aaSProjectWebpro/Frontend-User/forgotChange.html?token='.$signature.'">http://localhost/aaSProjectWebpro/Frontend-User/forgotChange.html?token='.$signature.'</a>
+                </p>
+                <p>This link will expire in 1 hour for security reasons.</p>
+                <p>If you have any questions or need further assistance, please dont hesitate to contact us at
+                    <a href="#">support@libralyra.com</a>.
+                </p>
+                <p>Best regards,<br>LibraLyra Team</p>
+            </div>
+            </body>
+            </html>
+        ');
+        if ($this->email->send()) {
+            $data = array(
+                'status' => 200,
+                'token' => $headerPayload
+            );
+            $this->response($data, 200);
+        }
+    }
+    public function forgotGanti_patch(){
+        if (isset($this->input->request_headers()['Authorization'])) {
+            if ($this->jwt->decodeForgot($this->input->request_headers()['Authorization']) == false) {
+                return $this->response(
+                    array(
+                        'kode' => '401',
+                        'pesan' => 'Link ini sudah tidak berfungsi.',
+                        'data' => []
+                    ), 401
+                );
+            }
+        } else {
+            return $this->response(
+                array(
+                    'kode' => '401',
+                    'pesan' => 'Link ini sudah tidak berfungsi.',
+                    'data' => []
+                ), 401
+            );
+        }
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $putData = $this->input->input_stream();
+        $_POST = $putData;
+        $jwt=explode("Bearer ",$this->input->request_headers()['Authorization']);
+        $_POST['id']=json_decode(base64_decode(explode('.', $jwt[1])[1]))->data->id;
+        $this->form_validation->set_rules('repeat_new_pw', 'repeat_new_pw', 'required|callback_new_pw');
+        $this->form_validation->set_rules('new_pw', 'new_pw', 'required|callback_new_pw');
+        $this->form_validation->set_rules('id', 'ID', 'required|callback_ifExist');
+        if ($this->form_validation->run() === FALSE) {
+            $error_array = $this->form_validation->error_array();
+            $response = array(
+                'status' => 502,
+                'message' => $error_array
+            );
+            return $this->response($response, 502);
+        }
+        $data = array(
+            'password' => hash('sha256', $_POST['new_pw']),
+        );
+        if ($this->UserModel->update($_POST['id'], $data)) {
+            $response = array(
+                'status' => 201,
+                'message' => 'Success'
+            );
+            return $this->response($response, 201);
+        }
+
     }
 }
